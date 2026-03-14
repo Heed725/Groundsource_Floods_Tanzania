@@ -70,6 +70,12 @@ h1 {
   gap: 12px;
 }
 
+.credits {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
 .controls label,
 .stat-label {
   font-size: 0.85rem;
@@ -77,6 +83,18 @@ h1 {
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+.credit-heading,
+.credit-list {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.credit-heading {
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .controls input,
