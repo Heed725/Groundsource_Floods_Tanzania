@@ -22,6 +22,7 @@ let allData = null;
 let layer = null;
 let allBounds = null;
 let visibleData = null;
+let shpWritePromise = null;
 
 function formatArea(value) {
   const number = Number(value);
@@ -138,6 +139,26 @@ function downloadBlob(filename, blob) {
   URL.revokeObjectURL(url);
 }
 
+function ensureShpWriteLoaded() {
+  if (window.shpwrite) {
+    return Promise.resolve(window.shpwrite);
+  }
+
+  if (shpWritePromise) {
+    return shpWritePromise;
+  }
+
+  shpWritePromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/@mapbox/shp-write@0.4.3/shpwrite.js";
+    script.onload = () => resolve(window.shpwrite);
+    script.onerror = () => reject(new Error("Could not load the shapefile export library."));
+    document.head.appendChild(script);
+  });
+
+  return shpWritePromise;
+}
+
 function downloadGeoJson() {
   if (!visibleData) {
     return;
@@ -149,15 +170,21 @@ function downloadGeoJson() {
   downloadBlob("groundsource_tanzania_filtered.geojson", blob);
 }
 
-function downloadShapefile() {
-  if (!visibleData || !visibleData.features.length || !window.shpwrite) {
+async function downloadShapefile() {
+  if (!visibleData || !visibleData.features.length) {
     return;
   }
 
-  window.shpwrite.download(visibleData, {
-    folder: "groundsource_tanzania_filtered",
-    file: "groundsource_tanzania_filtered"
-  });
+  try {
+    const shpwrite = await ensureShpWriteLoaded();
+    shpwrite.download(visibleData, {
+      folder: "groundsource_tanzania_filtered",
+      file: "groundsource_tanzania_filtered"
+    });
+  } catch (error) {
+    console.error(error);
+    statusEl.textContent = error.message;
+  }
 }
 
 async function loadData() {
