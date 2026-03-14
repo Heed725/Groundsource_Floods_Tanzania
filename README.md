@@ -1,6 +1,6 @@
-# Groundsource Tanzania Web Map
+# Groundsource Floods Tanzania
 
-This is a static Leaflet web map built for GitHub Pages.
+This repository contains a static Leaflet web map built from the Groundsource Tanzania GeoJSON dataset and designed to be hosted on GitHub Pages.
 
 ## Files
 
@@ -11,7 +11,7 @@ This is a static Leaflet web map built for GitHub Pages.
 
 ## Run locally
 
-Because the map loads GeoJSON with `fetch`, open it through a local web server instead of double-clicking the HTML file.
+Because the map loads GeoJSON with `fetch`, serve it through a local web server instead of opening the HTML file directly.
 
 If you have Python:
 
@@ -23,10 +23,10 @@ Then visit `http://localhost:8000`.
 
 ## Deploy to GitHub Pages
 
-1. Create a GitHub repository and push this folder.
+1. Push this repository to GitHub.
 2. In GitHub, open `Settings` -> `Pages`.
 3. Under `Build and deployment`, choose `Deploy from a branch`.
-4. Select your default branch and the `/ (root)` folder.
+4. Select the `main` branch and the `/ (root)` folder.
 5. Save. GitHub will publish the site at your Pages URL.
 
 ## Notes
