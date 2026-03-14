@@ -11,13 +11,17 @@ const statusEl = document.getElementById("status");
 const visibleCountEl = document.getElementById("visible-count");
 const totalCountEl = document.getElementById("total-count");
 const dateRangeEl = document.getElementById("date-range");
-const dateFilterEl = document.getElementById("date-filter");
+const startDateFilterEl = document.getElementById("start-date-filter");
+const endDateFilterEl = document.getElementById("end-date-filter");
 const resetFilterButton = document.getElementById("reset-filter");
 const zoomAllButton = document.getElementById("zoom-all");
+const downloadGeoJsonButton = document.getElementById("download-geojson");
+const downloadShapefileButton = document.getElementById("download-shapefile");
 
 let allData = null;
 let layer = null;
 let allBounds = null;
+let visibleData = null;
 
 function formatArea(value) {
   const number = Number(value);
@@ -60,6 +64,8 @@ function renderGeoJson(data) {
     map.removeLayer(layer);
   }
 
+  visibleData = data;
+
   layer = L.geoJSON(data, {
     style: styleFeature,
     onEachFeature(feature, featureLayer) {
@@ -81,8 +87,10 @@ function applyFilter() {
     return;
   }
 
-  const selectedDate = dateFilterEl.value;
-  if (!selectedDate) {
+  const selectedStartDate = startDateFilterEl.value;
+  const selectedEndDate = endDateFilterEl.value;
+
+  if (!selectedStartDate && !selectedEndDate) {
     renderGeoJson(allData);
     statusEl.textContent = "Showing all features.";
     return;
@@ -92,12 +100,64 @@ function applyFilter() {
     ...allData,
     features: allData.features.filter((feature) => {
       const startDate = feature.properties?.start_date;
-      return startDate && startDate >= selectedDate;
+      const endDate = feature.properties?.end_date || startDate;
+      if (!startDate || !endDate) {
+        return false;
+      }
+
+      if (selectedStartDate && endDate < selectedStartDate) {
+        return false;
+      }
+
+      if (selectedEndDate && startDate > selectedEndDate) {
+        return false;
+      }
+
+      return true;
     })
   };
 
   renderGeoJson(filtered);
-  statusEl.textContent = `Showing features with start date on or after ${selectedDate}.`;
+  if (selectedStartDate && selectedEndDate) {
+    statusEl.textContent = `Showing features from ${selectedStartDate} to ${selectedEndDate}.`;
+  } else if (selectedStartDate) {
+    statusEl.textContent = `Showing features on or after ${selectedStartDate}.`;
+  } else {
+    statusEl.textContent = `Showing features on or before ${selectedEndDate}.`;
+  }
+}
+
+function downloadBlob(filename, blob) {
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function downloadGeoJson() {
+  if (!visibleData) {
+    return;
+  }
+
+  const blob = new Blob([JSON.stringify(visibleData, null, 2)], {
+    type: "application/geo+json"
+  });
+  downloadBlob("groundsource_tanzania_filtered.geojson", blob);
+}
+
+function downloadShapefile() {
+  if (!visibleData || !visibleData.features.length || !window.shpwrite) {
+    return;
+  }
+
+  window.shpwrite.download(visibleData, {
+    folder: "groundsource_tanzania_filtered",
+    file: "groundsource_tanzania_filtered"
+  });
 }
 
 async function loadData() {
@@ -112,8 +172,10 @@ async function loadData() {
 
     const dates = sortDateStrings(allData.features.map((feature) => feature.properties?.start_date));
     if (dates.length > 0) {
-      dateFilterEl.min = dates[0];
-      dateFilterEl.max = dates[dates.length - 1];
+      startDateFilterEl.min = dates[0];
+      startDateFilterEl.max = dates[dates.length - 1];
+      endDateFilterEl.min = dates[0];
+      endDateFilterEl.max = dates[dates.length - 1];
       dateRangeEl.textContent = `${dates[0]} to ${dates[dates.length - 1]}`;
     } else {
       dateRangeEl.textContent = "No dates found";
@@ -132,10 +194,12 @@ async function loadData() {
   }
 }
 
-dateFilterEl.addEventListener("change", applyFilter);
+startDateFilterEl.addEventListener("change", applyFilter);
+endDateFilterEl.addEventListener("change", applyFilter);
 
 resetFilterButton.addEventListener("click", () => {
-  dateFilterEl.value = "";
+  startDateFilterEl.value = "";
+  endDateFilterEl.value = "";
   applyFilter();
 });
 
@@ -144,5 +208,8 @@ zoomAllButton.addEventListener("click", () => {
     map.fitBounds(allBounds.pad(0.04));
   }
 });
+
+downloadGeoJsonButton.addEventListener("click", downloadGeoJson);
+downloadShapefileButton.addEventListener("click", downloadShapefile);
 
 loadData();

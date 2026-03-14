@@ -24,10 +24,14 @@
       </p>
 
       <section class="controls">
-        <label for="date-filter">Start date filter</label>
-        <input id="date-filter" type="date">
+        <label for="start-date-filter">Start date filter</label>
+        <input id="start-date-filter" type="date">
+        <label for="end-date-filter">End date filter</label>
+        <input id="end-date-filter" type="date">
         <button id="reset-filter" type="button">Show all features</button>
         <button id="zoom-all" type="button">Zoom to dataset</button>
+        <button id="download-geojson" type="button">Download GeoJSON</button>
+        <button id="download-shapefile" type="button">Download ZIP Shapefile</button>
       </section>
 
       <section class="stats">
@@ -58,6 +62,7 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
+  <script src="https://unpkg.com/@mapbox/shp-write@0.4.3/shpwrite.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
