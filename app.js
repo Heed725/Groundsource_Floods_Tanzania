@@ -1,5 +1,6 @@
 const map = L.map("map", {
-  zoomControl: true
+  zoomControl: true,
+  preferCanvas: true
 }).setView([-6.2, 35.1], 6);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -79,6 +80,9 @@ function renderGeoJson(data) {
 
   const bounds = layer.getBounds();
   if (bounds.isValid()) {
+    if (data === allData) {
+      allBounds = bounds;
+    }
     map.fitBounds(bounds.pad(0.04));
   }
 }
@@ -207,11 +211,6 @@ async function loadData() {
     } else {
       dateRangeEl.textContent = "No dates found";
     }
-
-    layer = L.geoJSON(allData);
-    allBounds = layer.getBounds();
-    map.removeLayer(layer);
-    layer = null;
 
     renderGeoJson(allData);
     statusEl.textContent = "Dataset loaded.";
