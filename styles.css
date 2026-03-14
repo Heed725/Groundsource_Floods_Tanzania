@@ -122,15 +122,6 @@ h1 {
   background: #244f86;
 }
 
-#apply-clip,
-#clear-clip {
-  background: #8a5a10;
-}
-
-#clip-file {
-  padding: 10px 12px;
-}
-
 .controls button:hover {
   transform: translateY(-1px);
   opacity: 0.95;

@@ -31,10 +31,6 @@
         <input id="start-date-filter" type="date">
         <label for="end-date-filter">End date filter</label>
         <input id="end-date-filter" type="date">
-        <label for="clip-file">Clip boundary GeoJSON</label>
-        <input id="clip-file" type="file" accept=".geojson,.json,application/geo+json,application/json">
-        <button id="apply-clip" type="button">Clip to uploaded GeoJSON</button>
-        <button id="clear-clip" type="button">Clear clip</button>
         <button id="reset-filter" type="button">Show all features</button>
         <button id="zoom-all" type="button">Zoom to dataset</button>
         <button id="download-geojson" type="button">Download GeoJSON</button>
@@ -92,7 +88,6 @@
     crossorigin=""
   ></script>
   <script src="https://unpkg.com/@mapbox/shp-write@0.4.3/shpwrite.js"></script>
-  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
